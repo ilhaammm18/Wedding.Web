@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavbarScroll();
   initActiveNavLink();
   initMobileMenu();
+  initConsultForm();
 });
 
 /* ==========================================================================
@@ -112,33 +113,49 @@ function closeConsultModal() {
   document.body.style.overflow = '';
 }
 
-function handleConsultSubmit(event) {
-  event.preventDefault();
-  const name = document.getElementById('consultName').value;
-  const phone = document.getElementById('consultPhone').value;
-  const pkg = document.getElementById('consultPackage').value;
-  const date = document.getElementById('consultDate').value || 'Akan dikonfirmasi kemudian';
-  const notes = document.getElementById('consultNotes').value || 'Tidak ada catatan tambahan';
+function initConsultForm() {
+  const consultForm = document.getElementById('consultForm');
+  if (consultForm && !consultForm.getAttribute('onsubmit')) {
+    consultForm.addEventListener('submit', handleConsultSubmit);
+  }
+}
 
-  // Format WhatsApp message
-  const waText = encodeURIComponent(
-    `Halo Azzahra Wedding Organizer,\n\nSaya ingin berkonsultasi mengenai rencana pernikahan kami:\n` +
-    `• Nama Pasangan: ${name}\n` +
-    `• No. WhatsApp: ${phone}\n` +
-    `• Peminatan Paket: ${pkg}\n` +
-    `• Perkiraan Tanggal/Bulan: ${date}\n` +
-    `• Konsep / Catatan: ${notes}\n\n` +
-    `Mohon info ketersediaan tanggal dan proposal rinciannya. Terima kasih!`
-  );
+function handleConsultSubmit(e) {
+  // Cegah halaman reload saat form dikirim
+  e.preventDefault();
 
+  // Tangkap nilai (value) dari elemen input
+  const nama = document.getElementById('consultName').value;
+  const noWA = document.getElementById('consultPhone').value;
+  const paket = document.getElementById('consultPackage').value;
+  const tanggal = document.getElementById('consultDate').value;
+  const catatan = document.getElementById('consultNotes').value;
+
+  // Rangkai nilai-nilai tersebut menjadi sebuah pesan teks (string)
+  const pesan = `Halo tim WeddingDreams, saya ingin menjadwalkan konsultasi. Berikut detail rencana acara kami:
+- Nama Pasangan: ${nama}
+- No. WA: ${noWA}
+- Paket Diminati: ${paket}
+- Rencana Tanggal: ${tanggal || '-'}
+- Catatan Konsep: ${catatan || '-'}`;
+
+  // Gunakan fungsi encodeURIComponent() pada string pesan agar aman dimasukkan ke dalam URL
+  const pesanEncoded = encodeURIComponent(pesan);
+
+  // Buat variabel URL yang mengarah ke API WhatsApp
+  const url = `https://wa.me/6281234567890?text=${pesanEncoded}`;
+
+  // Gunakan window.open(url, '_blank') untuk mengarahkan pengguna ke tab baru
+  window.open(url, '_blank');
+
+  // Tutup modal dan reset form
   closeConsultModal();
+  const form = document.getElementById('consultForm');
+  if (form) {
+    form.reset();
+  }
+
   showToast('Permintaan konsultasi berhasil disiapkan! Mengalihkan ke WhatsApp...');
-
-  setTimeout(() => {
-    window.open(`https://wa.me/6281234567890?text=${waText}`, '_blank');
-  }, 1200);
-
-  document.getElementById('consultForm').reset();
 }
 
 /* ==========================================================================
