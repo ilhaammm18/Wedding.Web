@@ -113,6 +113,13 @@ function closeConsultModal() {
   document.body.style.overflow = '';
 }
 
+function handleConsultSubmit(event) {
+  event.preventDefault();
+  const name = document.getElementById('consultName').value;
+  const phone = document.getElementById('consultPhone').value;
+  const pkg = document.getElementById('consultPackage').value;
+  const date = document.getElementById('consultDate').value || 'Akan dikonfirmasi kemudian';
+  const notes = document.getElementById('consultNotes').value || 'Tidak ada catatan tambahan';
 function initConsultForm() {
   const consultForm = document.getElementById('consultForm');
   if (consultForm && !consultForm.getAttribute('onsubmit')) {
@@ -120,6 +127,16 @@ function initConsultForm() {
   }
 }
 
+  // Format WhatsApp message
+  const waText = encodeURIComponent(
+    `Halo Azzahra Wedding Organizer,\n\nSaya ingin berkonsultasi mengenai rencana pernikahan kami:\n` +
+    `• Nama Pasangan: ${name}\n` +
+    `• No. WhatsApp: ${phone}\n` +
+    `• Peminatan Paket: ${pkg}\n` +
+    `• Perkiraan Tanggal/Bulan: ${date}\n` +
+    `• Konsep / Catatan: ${notes}\n\n` +
+    `Mohon info ketersediaan tanggal dan proposal rinciannya. Terima kasih!`
+  );
 function handleConsultSubmit(e) {
   // Cegah halaman reload saat form dikirim
   e.preventDefault();
@@ -156,6 +173,12 @@ function handleConsultSubmit(e) {
   }
 
   showToast('Permintaan konsultasi berhasil disiapkan! Mengalihkan ke WhatsApp...');
+
+  setTimeout(() => {
+    window.open(`https://wa.me/6281234567890?text=${waText}`, '_blank');
+  }, 1200);
+
+  document.getElementById('consultForm').reset();
 }
 
 /* ==========================================================================
